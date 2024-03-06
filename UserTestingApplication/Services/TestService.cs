@@ -1,4 +1,7 @@
-﻿using UserTestingApplication.Models;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Components.Forms.Mapping;
+using UserTestingApplication.DTOs;
+using UserTestingApplication.Models;
 using UserTestingApplication.Repositories;
 using UserTestingApplication.Repositories.Filters;
 using UserTestingApplication.Repositories.Inerfaces;
@@ -10,27 +13,30 @@ namespace UserTestingApplication.Services
     {
         private readonly ITestRepository _testRepository;
         private readonly IApplicationUserRepository _applicationUserRepository;
+        private readonly IMapper _mapper;
 
         public TestService(
             ITestRepository testRepository, 
-            IApplicationUserRepository applicationUserRepository) 
+            IApplicationUserRepository applicationUserRepository,
+            IMapper maper) 
         {
             _testRepository = testRepository;
             _applicationUserRepository = applicationUserRepository;
+            _mapper = maper;
         }
 
-        public async Task<IEnumerable<Test>> GetAvailableTestsForUserAsync(
+        public async Task<IEnumerable<TestDTO>> GetAvailableTestsForUserAsync(
             ApplicationUserFilter applicationUserFilter)
         {
             var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).FirstOrDefault();
-            return user.Tests;
+            return _mapper.Map<IEnumerable<TestDTO>>(user.Tests);
         }
 
-        public async Task<IEnumerable<CompletedTest>> GetCompletedTestsForUserAsync(
+        public async Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(
             ApplicationUserFilter applicationUserFilter)
         {
             var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).FirstOrDefault();
-            return user.CompletedTests;
+            return _mapper.Map<IEnumerable<CompletedTestDTO>>(user.CompletedTests);
         }
     }
 }
