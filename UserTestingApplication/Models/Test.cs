@@ -11,7 +11,8 @@ namespace UserTestingApplication.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public TimeSpan Duration { get; set; }
-        public ICollection<Test> Questions { get; set; }
+        public ICollection<Question> Questions { get; set; }
+        [ForeignKey(nameof(ApplicationUserId))]
+        public string ApplicationUserId { get; set; }
     }
 }

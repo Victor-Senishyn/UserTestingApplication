@@ -1,4 +1,5 @@
-﻿using UserTestingApplication.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using UserTestingApplication.Data;
 using UserTestingApplication.Models;
 using UserTestingApplication.Repositories.Filters;
 using UserTestingApplication.Repositories.Inerfaces;
@@ -29,7 +30,7 @@ namespace UserTestingApplication.Repositories
             _dbContext.Set<Test>().Remove(test);
         }
 
-        public async Task<IQueryable<Test>> GetAsync(TestFilter testFilter)
+        public async Task<IQueryable<Test>> GetAsync(TestFilter testFilter = null)
         {
             var query = _dbContext.Tests.AsQueryable();
 
@@ -41,6 +42,11 @@ namespace UserTestingApplication.Repositories
                 query = query.Where(test => test.Description == testFilter.Description);
 
             return query;
+        }
+
+        public async Task<IEnumerable<Test>> GetTestsAsync()
+        {
+            return await _dbContext.Tests.ToListAsync();
         }
     }
 }

@@ -24,11 +24,7 @@ namespace UserTestingApplication.Controllers
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var completedTests = await _testService.GetCompletedTestsForUserAsync(
-                new ApplicationUserFilter
-                {
-                    Id = userId,
-                });
+            var completedTests = await _testService.GetCompletedTestsForUserAsync(userId);
 
             return Ok(completedTests);
         }
@@ -38,13 +34,19 @@ namespace UserTestingApplication.Controllers
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var availableTests = await _testService.GetAvailableTestsForUserAsync(
-                new ApplicationUserFilter
-                {
-                    Id = userId,
-                });
+            var availableTests = await _testService.GetAvailableTestsForUserAsync(userId);
 
             return Ok(availableTests);
+        }
+
+        [HttpPost("/tests/add")]
+        public async Task<IActionResult> AddTest()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var test = await _testService.CreateTestsForUser(userId);
+
+            return Ok(test); 
         }
     }
 }

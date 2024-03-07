@@ -29,14 +29,14 @@ namespace UserTestingApplication.Repositories
             _dbContext.Set<CompletedTest>().Remove(completedTest);
         }
 
-        public async Task<IQueryable<CompletedTest>> GetAsync(CompletedTestFilter completedTestFilter)
+        public async Task<IQueryable<CompletedTest>> GetAsync(CompletedTestFilter completedTestFilter = null)
         {
             var query = _dbContext.CompletedTests.AsQueryable();
 
             if (completedTestFilter.Id != null)
                 query = query.Where(completedTest => completedTest.Id == completedTestFilter.Id);
-            else if (completedTestFilter.UserId != null)
-                query = query.Where(completedTest => completedTest.UserId == completedTestFilter.UserId);
+            else if (completedTestFilter.ApplicationUserId != null)
+                query = query.Where(completedTest => completedTest.ApplicationUserId == completedTestFilter.ApplicationUserId);
             else if (completedTestFilter.TestId != null)
                 query = query.Where(completedTest => completedTest.TestId == completedTestFilter.TestId);
             else if (completedTestFilter.Score != null)

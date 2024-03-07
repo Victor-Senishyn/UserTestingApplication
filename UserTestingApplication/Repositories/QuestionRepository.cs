@@ -29,7 +29,7 @@ namespace UserTestingApplication.Repositories
             _dbContext.Set<Question>().Remove(question);
         }
 
-        public async Task<IQueryable<Question>> GetAsync(QuestionFilter questionFilter)
+        public async Task<IQueryable<Question>> GetAsync(QuestionFilter questionFilter = null)
         {
             var query = _dbContext.Questions.AsQueryable();
 

@@ -12,7 +12,7 @@ using UserTestingApplication.Data;
 namespace UserTestingApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240306173503_init")]
+    [Migration("20240307002404_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -281,11 +281,16 @@ namespace UserTestingApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("TestId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TestId");
 
                     b.ToTable("Question");
                 });
@@ -299,17 +304,12 @@ namespace UserTestingApplication.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("interval");
-
-                    b.Property<int?>("TestId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -318,8 +318,6 @@ namespace UserTestingApplication.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("TestId");
 
                     b.ToTable("Test");
                 });
@@ -389,15 +387,20 @@ namespace UserTestingApplication.Migrations
                         .HasForeignKey("ApplicationUserId");
                 });
 
+            modelBuilder.Entity("UserTestingApplication.Models.Question", b =>
+                {
+                    b.HasOne("UserTestingApplication.Models.Test", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("TestId");
+                });
+
             modelBuilder.Entity("UserTestingApplication.Models.Test", b =>
                 {
                     b.HasOne("UserTestingApplication.Models.ApplicationUser", null)
                         .WithMany("Tests")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("UserTestingApplication.Models.Test", null)
-                        .WithMany("Questions")
-                        .HasForeignKey("TestId");
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("UserTestingApplication.Models.ApplicationUser", b =>

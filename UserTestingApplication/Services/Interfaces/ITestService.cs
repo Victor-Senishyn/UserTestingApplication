@@ -6,7 +6,8 @@ namespace UserTestingApplication.Services.Interfaces
 {
     public interface ITestService
     {
-        Task<IEnumerable<TestDTO>> GetAvailableTestsForUserAsync(ApplicationUserFilter applicationUserFilter);
-        Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(ApplicationUserFilter applicationUserFilter);
+        Task<IEnumerable<TestDTO>> GetAvailableTestsForUserAsync(string userId);
+        Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(string userId);
+        Task<Test> CreateTestsForUser(string userId);
     }
 }
