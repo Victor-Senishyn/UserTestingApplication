@@ -35,9 +35,9 @@ namespace UserTestingApplication.Repositories
 
             if (applicationUserFilter.Id != null)
                 query = query.Where(applicationUser => applicationUser.Id == applicationUserFilter.Id);
-            else if (applicationUserFilter.Email != null)
+            if (applicationUserFilter.Email != null)
                 query = query.Where(applicationUser => applicationUser.Email == applicationUserFilter.Email);
-            else if (applicationUserFilter.UserName != null)
+            if (applicationUserFilter.UserName != null)
                 query = query.Where(applicationUser => applicationUser.UserName == applicationUserFilter.UserName);
 
             return query;

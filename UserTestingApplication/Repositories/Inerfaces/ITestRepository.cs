@@ -9,6 +9,5 @@ namespace UserTestingApplication.Repositories.Inerfaces
         Task AddAsync(Test test);
         Task CommitAsync();
         Task DeleteAsync(Test test);
-        Task<IEnumerable<Test>> GetTestsAsync();
     }
 }

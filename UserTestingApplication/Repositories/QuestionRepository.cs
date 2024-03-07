@@ -35,7 +35,7 @@ namespace UserTestingApplication.Repositories
 
             if (questionFilter.Id != null)
                 query = query.Where(question => question.Id == questionFilter.Id);
-            else if (questionFilter.Text != null)
+            if (questionFilter.Text != null)
                 query = query.Where(question => question.Text == questionFilter.Text);
 
             return query;

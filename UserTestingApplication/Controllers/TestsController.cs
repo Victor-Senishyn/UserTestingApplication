@@ -13,28 +13,40 @@ namespace UserTestingApplication.Controllers
     public class TestsController : Controller
     {
         private ITestService _testService;
+        private readonly string _userId;
 
-        public TestsController(ITestService testService)
+        public TestsController(
+            ITestService testService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _testService = testService;
+            _userId = httpContextAccessor.HttpContext
+                .User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
-        //[HttpGet("/tests/completed")]
-        //public async Task<IActionResult> GetCompletedTestsAsync()
-        //{
-        //    string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        [HttpGet("/tests/")]
+        public async Task<IActionResult> GetTestsAsync()
+        {
+            var completedTests = await _testService.GetTestsForUserAsync(
+                new TestFilter { ApplicationUserId = _userId });
 
-        //    var completedTests = await _testService.GetCompletedTestsForUserAsync(userId);
+            return Ok(completedTests);
+        }
 
-        //    return Ok(completedTests);
-        //}
+        [HttpGet("/tests/completed")]
+        public async Task<IActionResult> GetCompletedTestsAsync()
+        {
+            var completedTests = await _testService.GetTestsForUserAsync(
+                new TestFilter { ApplicationUserId = _userId, IsCompleted = true });
+
+            return Ok(completedTests);
+        }
 
         [HttpGet("/tests/available")]
         public async Task<IActionResult> GetAvailableTestsAsync()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var availableTests = await _testService.GetAvailableTestsForUserAsync(userId);
+            var availableTests = await _testService.GetTestsForUserAsync(
+                new TestFilter { ApplicationUserId = _userId, IsCompleted = false });
 
             return Ok(availableTests);
         }
@@ -42,9 +54,7 @@ namespace UserTestingApplication.Controllers
         [HttpPost("/tests/add")]
         public async Task<IActionResult> AddTest()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var test = await _testService.CreateTestsForUser(userId);
+            var test = await _testService.CreateTestsForUser(_userId);
 
             return Ok(test); 
         }

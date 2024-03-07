@@ -36,17 +36,16 @@ namespace UserTestingApplication.Repositories
 
             if (testFilter.Id != null)
                 query = query.Where(test => test.Id == testFilter.Id);
-            else if (testFilter.Title != null)
+            if (testFilter.Title != null)
                 query = query.Where(test => test.Title == testFilter.Title);
-            else if (testFilter.Description != null)
+            if (testFilter.Description != null)
                 query = query.Where(test => test.Description == testFilter.Description);
-
+            if (testFilter.IsCompleted != null)
+                query = query.Where(test => test.IsCompleted == testFilter.IsCompleted);
+            if (testFilter.ApplicationUserId != null)
+                query = query.Where(test => test.ApplicationUserId == testFilter.ApplicationUserId);
+            
             return query;
-        }
-
-        public async Task<IEnumerable<Test>> GetTestsAsync()
-        {
-            return await _dbContext.Tests.ToListAsync();
         }
     }
 }

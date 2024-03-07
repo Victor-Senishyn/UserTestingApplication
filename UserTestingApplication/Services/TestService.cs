@@ -28,29 +28,13 @@ namespace UserTestingApplication.Services
             _mapper = maper;
         }
 
-        public async Task<IEnumerable<TestDTO>> GetAvailableTestsForUserAsync(
-            string userId)
+        public async Task<IEnumerable<TestDTO>> GetTestsForUserAsync(
+            TestFilter testFilter)
         {
-            //var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).SingleOrDefault();
-
-            //if (user == null)
-            //    throw new Exception("User not found");
-
-            //var completedTestIds = user.CompletedTests.Select(ct => ct.TestId).ToList();
-
-            //var availableTests = (await _testRepository.GetAsync())
-            //    .Where(t => !completedTestIds.Contains(t.Id));
-
-            //return _mapper.Map<IEnumerable<TestDTO>>(availableTests);
-
-            var availableTests = await _testRepository.GetTestsAsync();
-
-            return _mapper.Map <IEnumerable<TestDTO>>(
-                availableTests.Where(t => t.ApplicationUserId == userId));
-
-            //var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).FirstOrDefault();
-            //return _mapper.Map<IEnumerable<TestDTO>>(user.Tests);
+            return _mapper.Map<IEnumerable<TestDTO>>(
+                await _testRepository.GetAsync(testFilter));
         }
+
 
         //public async Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(
         //    string userId)
