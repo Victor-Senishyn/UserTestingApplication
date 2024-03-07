@@ -19,15 +19,15 @@ namespace UserTestingApplication.Controllers
             _testService = testService;
         }
 
-        [HttpGet("/tests/completed")]
-        public async Task<IActionResult> GetCompletedTestsAsync()
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //[HttpGet("/tests/completed")]
+        //public async Task<IActionResult> GetCompletedTestsAsync()
+        //{
+        //    string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var completedTests = await _testService.GetCompletedTestsForUserAsync(userId);
+        //    var completedTests = await _testService.GetCompletedTestsForUserAsync(userId);
 
-            return Ok(completedTests);
-        }
+        //    return Ok(completedTests);
+        //}
 
         [HttpGet("/tests/available")]
         public async Task<IActionResult> GetAvailableTestsAsync()

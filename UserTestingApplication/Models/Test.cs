@@ -14,5 +14,7 @@ namespace UserTestingApplication.Models
         public ICollection<Question> Questions { get; set; }
         [ForeignKey(nameof(ApplicationUserId))]
         public string ApplicationUserId { get; set; }
+        public bool IsCompleted { get; set; }
+        public int? Score { get; set; }
     }
 }

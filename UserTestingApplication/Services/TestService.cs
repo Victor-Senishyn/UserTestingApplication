@@ -15,7 +15,6 @@ namespace UserTestingApplication.Services
     public class TestService : ITestService
     {
         private readonly ITestRepository _testRepository;
-        private readonly ICompletedTestRepository _completedTestRepository;
         private readonly IApplicationUserRepository _applicationUserRepository;
         private readonly IMapper _mapper;
 
@@ -53,15 +52,15 @@ namespace UserTestingApplication.Services
             //return _mapper.Map<IEnumerable<TestDTO>>(user.Tests);
         }
 
-        public async Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(
-            string userId)
-        {
-            var completedTests = await _completedTestRepository.GetAsync();
-            return _mapper.Map<IEnumerable<CompletedTestDTO>>(
-                completedTests.Where(t => t.ApplicationUserId == userId));
-            //var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).FirstOrDefault();
-            //return _mapper.Map<IEnumerable<CompletedTestDTO>>(user.CompletedTests);
-        }
+        //public async Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(
+        //    string userId)
+        //{
+        //    var completedTests = await _completedTestRepository.GetAsync();
+        //    return _mapper.Map<IEnumerable<CompletedTestDTO>>(
+        //        completedTests.Where(t => t.ApplicationUserId == userId));
+        //    //var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).FirstOrDefault();
+        //    //return _mapper.Map<IEnumerable<CompletedTestDTO>>(user.CompletedTests);
+        //}
 
 
         ////
