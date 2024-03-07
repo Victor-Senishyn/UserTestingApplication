@@ -28,7 +28,7 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetTestsAsync()
         {
             var completedTests = await _testService.GetTestsForUserAsync(
-                new TestFilter { ApplicationUserId = _userId });
+                new ApplicationUserTestFilter { ApplicationUserId = _userId });
 
             return Ok(completedTests);
         }
@@ -37,7 +37,7 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetCompletedTestsAsync()
         {
             var completedTests = await _testService.GetTestsForUserAsync(
-                new TestFilter { ApplicationUserId = _userId, IsCompleted = true });
+                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = true });
 
             return Ok(completedTests);
         }
@@ -46,9 +46,19 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetAvailableTestsAsync()
         {
             var availableTests = await _testService.GetTestsForUserAsync(
-                new TestFilter { ApplicationUserId = _userId, IsCompleted = false });
+                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = false });
 
             return Ok(availableTests);
+        }
+
+        [HttpGet("{testId}/questions")]
+        public async Task<IActionResult> GetQuestionsForTest(int testId)
+        {
+            var questions = await _testService.GetQuestionsForTest(testId);
+            if (questions == null)
+                return NotFound();
+
+            return Ok(questions);
         }
 
         [HttpPost("/tests/add")]

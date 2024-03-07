@@ -32,6 +32,9 @@ namespace UserTestingApplication.Repositories
         public async Task<IQueryable<Question>> GetAsync(QuestionFilter questionFilter = null)
         {
             var query = _dbContext.Questions.AsQueryable();
+            
+            if(questionFilter == null)
+                return query;
 
             if (questionFilter.Id != null)
                 query = query.Where(question => question.Id == questionFilter.Id);

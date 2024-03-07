@@ -33,6 +33,9 @@ namespace UserTestingApplication.Repositories
         {
             var query = _dbContext.ApplicationUsers.AsQueryable();
 
+            if (applicationUserFilter == null)
+                return query;
+
             if (applicationUserFilter.Id != null)
                 query = query.Where(applicationUser => applicationUser.Id == applicationUserFilter.Id);
             if (applicationUserFilter.Email != null)

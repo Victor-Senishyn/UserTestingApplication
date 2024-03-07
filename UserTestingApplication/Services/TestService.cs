@@ -15,39 +15,54 @@ namespace UserTestingApplication.Services
     public class TestService : ITestService
     {
         private readonly ITestRepository _testRepository;
+        private readonly IApplicationUserTestRepository _applicationUserTestRepository;
         private readonly IApplicationUserRepository _applicationUserRepository;
         private readonly IMapper _mapper;
 
         public TestService(
             ITestRepository testRepository, 
             IApplicationUserRepository applicationUserRepository,
+            IApplicationUserTestRepository applicationUserTestRepository,
             IMapper maper) 
         {
             _testRepository = testRepository;
             _applicationUserRepository = applicationUserRepository;
+            _applicationUserTestRepository = applicationUserTestRepository;
             _mapper = maper;
         }
 
         public async Task<IEnumerable<TestDTO>> GetTestsForUserAsync(
-            TestFilter testFilter)
+            ApplicationUserTestFilter applicationUserTestFilter)
         {
-            return _mapper.Map<IEnumerable<TestDTO>>(
-                await _testRepository.GetAsync(testFilter));
+            if (applicationUserTestFilter == null)
+                return _mapper.Map<IEnumerable<TestDTO>>
+                    (await _testRepository.GetAsync());
+
+            var usersTests = await _applicationUserTestRepository
+                .GetAsync(applicationUserTestFilter);
+
+            var usersTestsIds = await usersTests
+                .Select(aut => aut.TestId)
+                .ToListAsync();
+
+            var tests = await _testRepository.GetAsync();
+            tests = tests.Where(t => usersTestsIds.Contains(t.Id));
+
+            return _mapper.Map<IEnumerable<TestDTO>>(tests);
         }
 
+        public async Task<IEnumerable<QuestionDTO>> GetQuestionsForTest(int testId)
+        {
+            var test = (await _testRepository
+                .GetAsync(new TestFilter { Id = testId }))
+                .Include(t => t.Questions)
+                .SingleOrDefault();
 
-        //public async Task<IEnumerable<CompletedTestDTO>> GetCompletedTestsForUserAsync(
-        //    string userId)
-        //{
-        //    var completedTests = await _completedTestRepository.GetAsync();
-        //    return _mapper.Map<IEnumerable<CompletedTestDTO>>(
-        //        completedTests.Where(t => t.ApplicationUserId == userId));
-        //    //var user = (await _applicationUserRepository.GetAsync(applicationUserFilter)).FirstOrDefault();
-        //    //return _mapper.Map<IEnumerable<CompletedTestDTO>>(user.CompletedTests);
-        //}
+            if (test == null)
+                return null;
+            return _mapper.Map<IEnumerable<QuestionDTO>>(test.Questions);
+        }
 
-
-        ////
         public async Task<Test> CreateTestsForUser(string userId)
         {
             var test = new Test()
@@ -104,23 +119,8 @@ namespace UserTestingApplication.Services
             };
             await _testRepository.AddAsync(test);
 
-            var user = (await _applicationUserRepository.GetAsync(
-                new ApplicationUserFilter
-                {
-                    Id = userId
-                })).SingleOrDefault();
-
-            if (user != null)
-            {
-                if (user.Tests == null)
-                {
-                    user.Tests = new List<Test>(); 
-                }
-
-                user.Tests.Add(test); 
-
-                await _applicationUserRepository.CommitAsync(); 
-            }
+            await _applicationUserTestRepository.AddAsync(
+                new ApplicationUserTest { Test = test, ApplicationUserId = userId});
 
             await _testRepository.CommitAsync();
             return test;

@@ -35,6 +35,9 @@ namespace UserTestingApplication.Repositories
         {
             var query = _dbContext.Answers.AsQueryable();
 
+            if (answerFilter == null)
+                return query;
+
             if (answerFilter.Id != null)
                 query = query.Where(answer => answer.Id == answerFilter.Id);
             if (answerFilter.IsCorrect != null)
