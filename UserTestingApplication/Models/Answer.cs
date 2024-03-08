@@ -10,8 +10,6 @@ namespace UserTestingApplication.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Text { get; set; }
-        //[ForeignKey(nameof(QuestionId))]
-        //public int QuestionId { get; set; }
         public bool IsCorrect { get; set; }
     }
 }

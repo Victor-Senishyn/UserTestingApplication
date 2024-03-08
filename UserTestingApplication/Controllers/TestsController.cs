@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using UserTestingApplication.Models;
 using UserTestingApplication.Repositories.Filters;
 using UserTestingApplication.Services;
 using UserTestingApplication.Services.Interfaces;
@@ -21,7 +22,7 @@ namespace UserTestingApplication.Controllers
         {
             _testService = testService;
             _userId = httpContextAccessor.HttpContext
-                .User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                .User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         }
 
         [HttpGet("/tests/")]
@@ -55,11 +56,24 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetQuestionsForTest(int testId)
         {
             var questions = await _testService.GetQuestionsForTest(testId);
+
             if (questions == null)
-                return NotFound();
+                return NotFound("No questions found for the specified test.");
 
             return Ok(questions);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitUserAnswers([FromBody] UserAnswer userAnswer)
+        {
+            if (userAnswer == null)
+                return BadRequest("Invalid user answer data.");
+
+            var result = await _testService.SubmitUserAnswers(userAnswer);
+
+            return Ok(result);
+        }
+
 
         [HttpPost("/tests/add")]
         public async Task<IActionResult> AddTest()

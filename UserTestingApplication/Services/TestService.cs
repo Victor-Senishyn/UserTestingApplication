@@ -38,15 +38,14 @@ namespace UserTestingApplication.Services
                 return _mapper.Map<IEnumerable<TestDTO>>
                     (await _testRepository.GetAsync());
 
-            var usersTests = await _applicationUserTestRepository
-                .GetAsync(applicationUserTestFilter);
-
-            var usersTestsIds = await usersTests
+            var usersTests = (await _applicationUserTestRepository
+                .GetAsync(applicationUserTestFilter))
+                .Include(t => t.Tests)
                 .Select(aut => aut.TestId)
-                .ToListAsync();
+                .ToList();
 
             var tests = await _testRepository.GetAsync();
-            tests = tests.Where(t => usersTestsIds.Contains(t.Id));
+            tests = tests.Where(t => usersTests.Contains(t.Id));
 
             return _mapper.Map<IEnumerable<TestDTO>>(tests);
         }
@@ -60,10 +59,46 @@ namespace UserTestingApplication.Services
 
             if (test == null)
                 return null;
+
             return _mapper.Map<IEnumerable<QuestionDTO>>(test.Questions);
         }
 
-        public async Task<Test> CreateTestsForUser(string userId)
+        public async Task<ApplicationUserTestDTO> SubmitUserAnswers(
+            UserAnswer userAnswer)
+        {
+            var test = (await _testRepository
+                .GetAsync(new TestFilter { Id = userAnswer.TestId }))
+                .Include(t => t.Questions)
+                .SingleOrDefault();
+
+            if (test == null || test.Questions.Count != userAnswer.QuestionIds.Count)
+                throw new Exception("Wrong data.");
+
+            int countOfQuestions = test.Questions.Count;
+            int correctAnswers = 0;
+
+            for (int i = 0; i < countOfQuestions; i++)
+            {
+                var question = test.Questions.ElementAt(i);
+                var userSelectedAnswerId = userAnswer.SelectedAnswerIds.ElementAt(i);
+
+                if (question.Answers.Any(a => a.Id == userSelectedAnswerId && a.IsCorrect))
+                    correctAnswers++;
+            }
+
+            int score = (int)(((double)correctAnswers / countOfQuestions) * 100);
+
+            return new ApplicationUserTestDTO
+            {
+                IsCompleted = true,
+                Score = score,
+                ApplicationUserId = userAnswer.UserId,
+                TestId = test.Id
+            };
+        }
+
+
+        public async Task<TestDTO> CreateTestsForUser(string userId)
         {
             var test = new Test()
             {
@@ -118,12 +153,13 @@ namespace UserTestingApplication.Services
                 }
             };
             await _testRepository.AddAsync(test);
+            await _testRepository.CommitAsync();
 
-            await _applicationUserTestRepository.AddAsync(
-                new ApplicationUserTest { Test = test, ApplicationUserId = userId});
+            var applicationUserTest = new ApplicationUserTest { ApplicationUserId = userId, TestId = test.Id, IsCompleted = true };
+            await _applicationUserTestRepository.AddAsync(applicationUserTest);
 
             await _testRepository.CommitAsync();
-            return test;
+            return _mapper.Map<TestDTO>(test);
         }
     }
 }

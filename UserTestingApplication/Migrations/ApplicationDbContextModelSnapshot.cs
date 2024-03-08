@@ -243,6 +243,34 @@ namespace UserTestingApplication.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("UserTestingApplication.Models.ApplicationUserTest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TestId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("ApplicationUserTest");
+                });
+
             modelBuilder.Entity("UserTestingApplication.Models.Question", b =>
                 {
                     b.Property<int>("Id")
@@ -273,19 +301,12 @@ namespace UserTestingApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int?>("ApplicationUserTestId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("Score")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -293,7 +314,7 @@ namespace UserTestingApplication.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ApplicationUserTestId");
 
                     b.ToTable("Test");
                 });
@@ -356,6 +377,17 @@ namespace UserTestingApplication.Migrations
                         .HasForeignKey("QuestionId");
                 });
 
+            modelBuilder.Entity("UserTestingApplication.Models.ApplicationUserTest", b =>
+                {
+                    b.HasOne("UserTestingApplication.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserTests")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("UserTestingApplication.Models.Question", b =>
                 {
                     b.HasOne("UserTestingApplication.Models.Test", null)
@@ -365,14 +397,17 @@ namespace UserTestingApplication.Migrations
 
             modelBuilder.Entity("UserTestingApplication.Models.Test", b =>
                 {
-                    b.HasOne("UserTestingApplication.Models.ApplicationUser", null)
+                    b.HasOne("UserTestingApplication.Models.ApplicationUserTest", null)
                         .WithMany("Tests")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApplicationUserTestId");
                 });
 
             modelBuilder.Entity("UserTestingApplication.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("ApplicationUserTests");
+                });
+
+            modelBuilder.Entity("UserTestingApplication.Models.ApplicationUserTest", b =>
                 {
                     b.Navigation("Tests");
                 });

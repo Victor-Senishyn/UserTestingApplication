@@ -10,7 +10,7 @@ namespace UserTestingApplication.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public bool IsCompleted { get; set; }
-
+        public int Score { get; set; }
         [ForeignKey(nameof(ApplicationUserId))]
         public string ApplicationUserId { get; set; }
         [ForeignKey(nameof(TestId))]
