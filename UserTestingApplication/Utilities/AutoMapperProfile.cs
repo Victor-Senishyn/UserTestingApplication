@@ -12,6 +12,7 @@ namespace UserTestingApplication.Utilities
         {
             CreateMap<Answer, AnswerDTO>();
             CreateMap<ApplicationUser, ApplicationUserDTO>();
+            CreateMap<ApplicationUserTest, ApplicationUserTestDTO>();
             CreateMap<Question, QuestionDTO>();
             CreateMap<Test, TestDTO>();
         }

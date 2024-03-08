@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 using System.Security.Claims;
+using UserTestingApplication.Exceptions;
 using UserTestingApplication.Models;
 using UserTestingApplication.Repositories.Filters;
 using UserTestingApplication.Services;
@@ -26,59 +28,78 @@ namespace UserTestingApplication.Controllers
         }
 
         [HttpGet("/tests/")]
-        public async Task<IActionResult> GetTestsAsync()
+        public async Task<IActionResult> GetTestsAsync(
+            CancellationToken cancellationToken)
         {
             var completedTests = await _testService.GetTestsForUserAsync(
-                new ApplicationUserTestFilter { ApplicationUserId = _userId });
+                new ApplicationUserTestFilter { ApplicationUserId = _userId }, cancellationToken);
 
             return Ok(completedTests);
         }
 
         [HttpGet("/tests/completed")]
-        public async Task<IActionResult> GetCompletedTestsAsync()
+        public async Task<IActionResult> GetCompletedTestsAsync(
+            CancellationToken cancellationToken)
         {
             var completedTests = await _testService.GetTestsForUserAsync(
-                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = true });
+                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = true }, cancellationToken);
 
             return Ok(completedTests);
         }
 
         [HttpGet("/tests/available")]
-        public async Task<IActionResult> GetAvailableTestsAsync()
+        public async Task<IActionResult> GetAvailableTestsAsync(
+            CancellationToken cancellationToken)
         {
             var availableTests = await _testService.GetTestsForUserAsync(
-                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = false });
+                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = false }, cancellationToken);
 
             return Ok(availableTests);
         }
 
         [HttpGet("{testId}/questions")]
-        public async Task<IActionResult> GetQuestionsForTest(int testId)
+        public async Task<IActionResult> GetQuestionsForTest(
+            int testId,
+            CancellationToken cancellationToken)
         {
-            var questions = await _testService.GetQuestionsForTest(testId);
-
-            if (questions == null)
-                return NotFound("No questions found for the specified test.");
-
-            return Ok(questions);
+            try
+            {
+                var questions = await _testService.GetQuestionsForTest(testId, cancellationToken);
+                return Ok(questions);
+            }
+            catch (TestNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitUserAnswers([FromBody] UserAnswer userAnswer)
+        public async Task<IActionResult> SubmitUserAnswers(
+            [FromBody] UserAnswer userAnswer,
+            CancellationToken cancellationToken)
         {
-            if (userAnswer == null)
-                return BadRequest("Invalid user answer data.");
-
-            var result = await _testService.SubmitUserAnswers(userAnswer);
-
-            return Ok(result);
+            try
+            {
+                var result = await _testService.SubmitUserAnswers(userAnswer, _userId, cancellationToken);
+                return Ok(result);
+            }
+            catch (DataValidationException ex) 
+            when (ex is TestAlreadyPassedException || ex is DataValidationException)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (TestNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
 
         [HttpPost("/tests/add")]
-        public async Task<IActionResult> AddTest()
+        public async Task<IActionResult> AddTest(
+            CancellationToken cancellationToken)
         {
-            var test = await _testService.CreateTestsForUser(_userId);
+            var test = await _testService.CreateTestsForUser(_userId, cancellationToken);
 
             return Ok(test); 
         }
