@@ -16,7 +16,7 @@ namespace UserTestingApplication.Services
     public class TestService : ITestService
     {
         private readonly ITestRepository _testRepository;
-        private readonly IApplicationUserTestRepository _applicationUserTestRepository;
+        private readonly IApplicationUserTestRepository _userTestResultRepository;
         private readonly IMapper _mapper;
 
         public TestService(
@@ -25,19 +25,19 @@ namespace UserTestingApplication.Services
             IMapper maper) 
         {
             _testRepository = testRepository;
-            _applicationUserTestRepository = applicationUserTestRepository;
+            _userTestResultRepository = applicationUserTestRepository;
             _mapper = maper;
         }
 
         public async Task<IEnumerable<TestDTO>> GetTestsForUserAsync(
-            ApplicationUserTestFilter applicationUserTestFilter,
+            UserTestResultFilter applicationUserTestFilter,
             CancellationToken cancellationToken = default)
         {
             if (applicationUserTestFilter == null)
                 return _mapper.Map<IEnumerable<TestDTO>>
                     (await _testRepository.GetAsync());
 
-            var usersTests = (await _applicationUserTestRepository
+            var usersTests = (await _userTestResultRepository
                 .GetAsync(applicationUserTestFilter))
                 .Include(t => t.Tests)
                 .Select(aut => aut.TestId)
@@ -49,7 +49,7 @@ namespace UserTestingApplication.Services
             return _mapper.Map<IEnumerable<TestDTO>>(tests);
         }
 
-        public async Task<IEnumerable<QuestionDTO>> GetQuestionsForTest(
+        public async Task<IEnumerable<QuestionDTO>> GetQuestionsForTestAsync(
             int testId,
             CancellationToken cancellationToken = default)
         {
@@ -64,19 +64,19 @@ namespace UserTestingApplication.Services
             return _mapper.Map<IEnumerable<QuestionDTO>>(test.Questions);
         }
 
-        public async Task<ApplicationUserTestDTO> SubmitUserAnswers(
+        public async Task<UserTestResultDTO> SubmitUserAnswersAsync(
             UserAnswer userAnswer, 
             string userId,
             CancellationToken cancellationToken = default)
         {
-            var applicationUserTest = (await _applicationUserTestRepository.GetAsync(
-                new ApplicationUserTestFilter { TestId = userAnswer.TestId, ApplicationUserId = userId }))
+            var userTestResult = (await _userTestResultRepository.GetAsync(
+                new UserTestResultFilter { TestId = userAnswer.TestId, ApplicationUserId = userId }))
                 .FirstOrDefault();
 
-            if (applicationUserTest == null)
+            if (userTestResult == null)
                 throw new DataValidationException("Wrong data.");
 
-            if (applicationUserTest.IsCompleted)
+            if (userTestResult.IsCompleted)
                 throw new TestAlreadyPassedException("The test has already been passed");
 
             var test = (await _testRepository
@@ -102,15 +102,15 @@ namespace UserTestingApplication.Services
 
             int score = (int)(((double)correctAnswers / countOfQuestions) * 100);
 
-            applicationUserTest.Score = score;
-            applicationUserTest.IsCompleted = true;
+            userTestResult.Score = score;
+            userTestResult.IsCompleted = true;
 
-            await _applicationUserTestRepository.CommitAsync();
+            await _userTestResultRepository.CommitAsync();
 
-            return _mapper.Map<ApplicationUserTestDTO>(applicationUserTest);
+            return _mapper.Map<UserTestResultDTO>(userTestResult);
         }
 
-        public async Task<TestDTO> CreateTestsForUser(
+        public async Task<TestDTO> CreateTestsForUserAsync(
             string userId,
             CancellationToken cancellationToken = default)
         {
@@ -169,8 +169,8 @@ namespace UserTestingApplication.Services
             await _testRepository.AddAsync(test);
             await _testRepository.CommitAsync();
 
-            var applicationUserTest = new ApplicationUserTest { ApplicationUserId = userId, TestId = test.Id, IsCompleted = false };
-            await _applicationUserTestRepository.AddAsync(applicationUserTest);
+            var userTestResult = new UserTestResult { ApplicationUserId = userId, TestId = test.Id, IsCompleted = false };
+            await _userTestResultRepository.AddAsync(userTestResult);
 
             await _testRepository.CommitAsync();
             return _mapper.Map<TestDTO>(test);

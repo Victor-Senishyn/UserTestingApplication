@@ -5,9 +5,9 @@ namespace UserTestingApplication.Repositories.Inerfaces
 {
     public interface IApplicationUserTestRepository
     {
-        Task<IQueryable<ApplicationUserTest>> GetAsync(ApplicationUserTestFilter applicationUserTestFilter = null);
-        Task AddAsync(ApplicationUserTest applicationUserTest);
+        Task<IQueryable<UserTestResult>> GetAsync(UserTestResultFilter userTestResultFilter = null);
+        Task AddAsync(UserTestResult userTestResult);
         Task CommitAsync();
-        Task DeleteAsync(ApplicationUserTest applicationUserTest);
+        Task DeleteAsync(UserTestResult userTestResult);
     }
 }

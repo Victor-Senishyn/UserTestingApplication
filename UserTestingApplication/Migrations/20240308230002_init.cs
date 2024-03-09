@@ -73,27 +73,6 @@ namespace UserTestingApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationUserTest",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "text", nullable: false),
-                    TestId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApplicationUserTest", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ApplicationUserTest_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -179,6 +158,28 @@ namespace UserTestingApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserTestResult",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Score = table.Column<int>(type: "integer", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "text", nullable: false),
+                    TestId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTestResult", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserTestResult_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Test",
                 columns: table => new
                 {
@@ -186,16 +187,15 @@ namespace UserTestingApplication.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Score = table.Column<int>(type: "integer", nullable: true),
-                    ApplicationUserTestId = table.Column<int>(type: "integer", nullable: true)
+                    UserTestResultId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Test", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Test_ApplicationUserTest_ApplicationUserTestId",
-                        column: x => x.ApplicationUserTestId,
-                        principalTable: "ApplicationUserTest",
+                        name: "FK_Test_UserTestResult_UserTestResultId",
+                        column: x => x.UserTestResultId,
+                        principalTable: "UserTestResult",
                         principalColumn: "Id");
                 });
 
@@ -244,11 +244,6 @@ namespace UserTestingApplication.Migrations
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserTest_ApplicationUserId",
-                table: "ApplicationUserTest",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -291,9 +286,14 @@ namespace UserTestingApplication.Migrations
                 column: "TestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Test_ApplicationUserTestId",
+                name: "IX_Test_UserTestResultId",
                 table: "Test",
-                column: "ApplicationUserTestId");
+                column: "UserTestResultId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTestResult_ApplicationUserId",
+                table: "UserTestResult",
+                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -327,7 +327,7 @@ namespace UserTestingApplication.Migrations
                 name: "Test");
 
             migrationBuilder.DropTable(
-                name: "ApplicationUserTest");
+                name: "UserTestResult");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

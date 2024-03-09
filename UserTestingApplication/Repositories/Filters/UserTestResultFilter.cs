@@ -2,7 +2,7 @@
 
 namespace UserTestingApplication.Repositories.Filters
 {
-    public class ApplicationUserTestFilter
+    public class UserTestResultFilter
     {
         public int? Id { get; set; }
         public string? ApplicationUserId { get; set; }

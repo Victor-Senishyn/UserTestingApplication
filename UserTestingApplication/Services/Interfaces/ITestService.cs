@@ -6,9 +6,9 @@ namespace UserTestingApplication.Services.Interfaces
 {
     public interface ITestService
     {
-        Task<IEnumerable<TestDTO>> GetTestsForUserAsync(ApplicationUserTestFilter applicationUserTestFilter, CancellationToken cancellationToken = default);
-        Task<TestDTO> CreateTestsForUser(string userId, CancellationToken cancellationToken = default);
-        Task<ApplicationUserTestDTO> SubmitUserAnswers(UserAnswer userAnswer, string userId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<QuestionDTO>> GetQuestionsForTest(int testId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TestDTO>> GetTestsForUserAsync(UserTestResultFilter applicationUserTestFilter, CancellationToken cancellationToken = default);
+        Task<TestDTO> CreateTestsForUserAsync(string userId, CancellationToken cancellationToken = default);
+        Task<UserTestResultDTO> SubmitUserAnswersAsync(UserAnswer userAnswer, string userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<QuestionDTO>> GetQuestionsForTestAsync(int testId, CancellationToken cancellationToken = default);
     }
 }

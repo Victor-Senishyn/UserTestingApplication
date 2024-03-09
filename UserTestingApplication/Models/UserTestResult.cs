@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UserTestingApplication.Models
 {
-    [Table(nameof(ApplicationUserTest))]
-    public class ApplicationUserTest
+    [Table(nameof(UserTestResult))]
+    public class UserTestResult
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

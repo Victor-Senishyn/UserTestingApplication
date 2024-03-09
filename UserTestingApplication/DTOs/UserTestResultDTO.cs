@@ -2,7 +2,7 @@
 
 namespace UserTestingApplication.DTOs
 {
-    public class ApplicationUserTestDTO
+    public class UserTestResultDTO
     {
         public int Id { get; set; }
         public bool IsCompleted { get; set; }

@@ -11,48 +11,49 @@ using UserTestingApplication.Services.Interfaces;
 namespace UserTestingApplication.Controllers
 {
     [ApiController]
-    [Route("/tests/")]
+    [Route("api/tests")]
     [Authorize]
     public class TestsController : Controller
     {
         private ITestService _testService;
-        private readonly string _userId;
 
-        public TestsController(
-            ITestService testService,
-            IHttpContextAccessor httpContextAccessor)
+        public string UserId
         {
-            _testService = testService;
-            _userId = httpContextAccessor.HttpContext
-                .User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            get => User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         }
 
-        [HttpGet("/tests/")]
+        public TestsController(
+            ITestService testService)
+        {
+            _testService = testService;
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetTestsAsync(
             CancellationToken cancellationToken)
         {
             var completedTests = await _testService.GetTestsForUserAsync(
-                new ApplicationUserTestFilter { ApplicationUserId = _userId }, cancellationToken);
+                new UserTestResultFilter { ApplicationUserId = UserId }, cancellationToken);
 
             return Ok(completedTests);
         }
 
-        [HttpGet("/tests/completed")]
+        [HttpGet("/completed")]
         public async Task<IActionResult> GetCompletedTestsAsync(
             CancellationToken cancellationToken)
         {
             var completedTests = await _testService.GetTestsForUserAsync(
-                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = true }, cancellationToken);
+                new UserTestResultFilter { ApplicationUserId = UserId, IsCompleted = true }, cancellationToken);
 
             return Ok(completedTests);
         }
 
-        [HttpGet("/tests/available")]
+        [HttpGet("/available")]
         public async Task<IActionResult> GetAvailableTestsAsync(
             CancellationToken cancellationToken)
         {
             var availableTests = await _testService.GetTestsForUserAsync(
-                new ApplicationUserTestFilter { ApplicationUserId = _userId, IsCompleted = false }, cancellationToken);
+                new UserTestResultFilter { ApplicationUserId = UserId, IsCompleted = false }, cancellationToken);
 
             return Ok(availableTests);
         }
@@ -64,7 +65,7 @@ namespace UserTestingApplication.Controllers
         {
             try
             {
-                var questions = await _testService.GetQuestionsForTest(testId, cancellationToken);
+                var questions = await _testService.GetQuestionsForTestAsync(testId, cancellationToken);
                 return Ok(questions);
             }
             catch (TestNotFoundException ex)
@@ -73,14 +74,14 @@ namespace UserTestingApplication.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPatch]
         public async Task<IActionResult> SubmitUserAnswers(
             [FromBody] UserAnswer userAnswer,
             CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _testService.SubmitUserAnswers(userAnswer, _userId, cancellationToken);
+                var result = await _testService.SubmitUserAnswersAsync(userAnswer, UserId, cancellationToken);
                 return Ok(result);
             }
             catch (DataValidationException ex) 
@@ -95,11 +96,11 @@ namespace UserTestingApplication.Controllers
         }
 
 
-        [HttpPost("/tests/add")]
+        [HttpPost("/add")]
         public async Task<IActionResult> AddTest(
             CancellationToken cancellationToken)
         {
-            var test = await _testService.CreateTestsForUser(_userId, cancellationToken);
+            var test = await _testService.CreateTestsForUserAsync(UserId, cancellationToken);
 
             return Ok(test); 
         }
