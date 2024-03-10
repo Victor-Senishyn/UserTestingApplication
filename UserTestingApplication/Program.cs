@@ -68,4 +68,11 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapIdentityApi<ApplicationUser>();
 
+app.UseCors(x =>
+{
+    x.WithHeaders().AllowAnyHeader();
+    x.WithMethods().AllowAnyMethod();
+    x.WithOrigins("http://localhost:3000");
+});
+
 app.Run();

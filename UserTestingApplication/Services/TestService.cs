@@ -56,6 +56,7 @@ namespace UserTestingApplication.Services
             var test = (await _testRepository
                 .GetAsync(new TestFilter { Id = testId }))
                 .Include(t => t.Questions)
+                .ThenInclude(q => q.Answers)
                 .SingleOrDefault();
 
             if (test == null)
