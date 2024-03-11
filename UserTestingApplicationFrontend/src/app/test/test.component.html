@@ -1,0 +1,19 @@
+<div *ngIf="questions && questions.length > 0">
+  <h2>Test Details</h2>
+  <ul>
+    <li *ngFor="let question of questions">
+      <p>{{ question.text }}</p>
+      <ul>
+        <li *ngFor="let answer of question.answers">
+          <input type="radio" name="answer_{{ question.id }}" [value]="answer.id">
+          <label>{{ answer.text }}</label>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <button (click)="submitAnswers()">Submit Answer</button>
+</div>
+
+<div *ngIf="!questions || questions.length === 0">
+  <p>No questions found for this test.</p>
+</div>

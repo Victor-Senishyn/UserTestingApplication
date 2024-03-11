@@ -1,0 +1,17 @@
+<div id="button-container">
+    <div id="routes-btn">
+      <button
+        *ngFor="let topLink of links"
+        [routerLink]="topLink.path"
+        [routerLinkActive]="topLink.active">
+        {{topLink.label}}
+      </button>
+    </div>
+    <div id="auth-buttons">
+      <button routerLink="/sign-in">SignIn</button>
+      <button routerLink="/sign-up">SignUp</button>
+    </div>
+  </div>
+<div id="main">
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,13 @@
+<div *ngIf="tests && tests.length > 0">
+  <h2>Completed Tests</h2>
+  <ul>
+    <li *ngFor="let test of tests">
+      <p>{{ test.name }}</p>
+      <p>{{ test.description }}</p>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="!tests || tests.length === 0">
+  <p>No completed tests found.</p>
+</div>

@@ -1,0 +1,14 @@
+<div *ngIf="tests && tests.length > 0">
+  <h2>Available Tests</h2>
+  <ul>
+    <li *ngFor="let test of tests">
+        <p>{{ test.name }}</p>
+        <p>{{ test.description }}</p>
+        <button (click)="openTest(test)">Open Test</button>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="!tests || tests.length === 0">
+  <p>No available tests found.</p>
+</div>

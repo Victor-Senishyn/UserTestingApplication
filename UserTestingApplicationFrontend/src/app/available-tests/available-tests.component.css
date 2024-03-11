@@ -1,0 +1,43 @@
+.available-tests {
+  margin-top: 20px;
+}
+
+.available-tests h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.available-tests .test-form {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.available-tests .test-form p {
+  margin: 0;
+}
+
+.available-tests .test-form button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.available-tests .test-form button:hover {
+  background-color: #0056b3;
+}
+
+.no-tests {
+  margin-top: 20px;
+}
+
+.no-tests p {
+  font-size: 16px;
+  color: #999;
+}
