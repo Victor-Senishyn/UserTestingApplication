@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { TokenContext } from '../token-context.service';
+import { TokenContextService } from '../token-context.service';
 
 @Component({
   selector: 'app-completed-tests',
@@ -14,7 +14,10 @@ import { TokenContext } from '../token-context.service';
 export class CompletedTestsComponent implements OnInit {
   tests: any[] = [];
 
-  constructor(private http: HttpClient, private tokenContext: TokenContext) {}
+  constructor(
+    private http: HttpClient,
+    private tokenContext: TokenContextService
+  ) {}
 
   ngOnInit(): void {
     this.getCompletedTests();

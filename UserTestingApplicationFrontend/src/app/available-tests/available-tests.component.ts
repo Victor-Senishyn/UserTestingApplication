@@ -3,7 +3,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { TokenContext } from '../token-context.service';
+import { TokenContextService } from '../token-context.service';
 
 @Component({
   selector: 'app-available-tests',
@@ -18,7 +18,7 @@ export class AvailableTestsComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private tokenContext: TokenContext
+    private tokenContext: TokenContextService
   ) {}
 
   ngOnInit(): void {

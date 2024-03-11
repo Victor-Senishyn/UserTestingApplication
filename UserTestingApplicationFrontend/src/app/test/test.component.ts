@@ -3,7 +3,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { TokenContext } from '../token-context.service';
+import { TokenContextService } from '../token-context.service';
 import { Question } from './question.model';
 
 @Component({
@@ -21,7 +21,7 @@ export class TestComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
-    private tokenContext: TokenContext
+    private tokenContext: TokenContextService
   ) {}
 
   ngOnInit(): void {

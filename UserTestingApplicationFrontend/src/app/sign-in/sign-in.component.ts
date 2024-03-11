@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
-import { TokenContext } from '../token-context.service';
+import { TokenContextService } from '../token-context.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -15,7 +15,10 @@ export class SignInComponent {
   email!: string;
   password!: string;
 
-  constructor(private http: HttpClient, private tokenContext: TokenContext) {}
+  constructor(
+    private http: HttpClient,
+    private tokenContext: TokenContextService
+  ) {}
 
   login(): void {
     const url = `${environment.apiUrl}/login`;
