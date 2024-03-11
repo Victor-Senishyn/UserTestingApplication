@@ -4,7 +4,6 @@ import { CompletedTestsComponent } from './completed-tests/completed-tests.compo
 import { SignInComponent } from './sign-in/sign-in.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { TestComponent } from './test/test.component';
-import { TestResultComponent } from './test-result/test-result.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'main' },
@@ -13,5 +12,4 @@ export const routes: Routes = [
   { path: 'sign-in', component: SignInComponent },
   { path: 'sign-up', component: SignUpComponent },
   { path: 'test/:id', component: TestComponent },
-  { path: 'test-result', component: TestResultComponent },
 ];

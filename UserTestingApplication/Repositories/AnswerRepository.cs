@@ -31,15 +31,18 @@ namespace UserTestingApplication.Repositories
             _dbContext.Set<Answer>().Remove(answer);
         }
 
-        public async Task<IQueryable<Answer>> GetAsync(AnswerFilter answerFilter)
+        public async Task<IQueryable<Answer>> GetAsync(AnswerFilter answerFilter = null)
         {
             var query = _dbContext.Answers.AsQueryable();
 
+            if (answerFilter == null)
+                return query;
+
             if (answerFilter.Id != null)
                 query = query.Where(answer => answer.Id == answerFilter.Id);
-            else if (answerFilter.IsCorrect != null)
+            if (answerFilter.IsCorrect != null)
                 query = query.Where(answer => answer.IsCorrect == answerFilter.IsCorrect);
-            else if (answerFilter.Text != null)
+            if (answerFilter.Text != null)
                 query = query.Where(answer => answer.Text == answerFilter.Text);
 
             return query;

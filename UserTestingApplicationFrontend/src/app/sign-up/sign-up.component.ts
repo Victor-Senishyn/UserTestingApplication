@@ -1,6 +1,7 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-sign-up',
@@ -15,7 +16,7 @@ export class SignUpComponent {
 
   constructor(private http: HttpClient) {}
   register(): void {
-    const url = 'https://localhost:7212/register';
+    const url = `${environment.apiUrl}/register`;
     const body = { email: this.email, password: this.password };
 
     this.http.post(url, body).subscribe(

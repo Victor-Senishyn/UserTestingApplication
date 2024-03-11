@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace UserTestingApplication.Configs
+namespace UserTestingApplication.Utilities
 {
     public class AuthOptions
     {

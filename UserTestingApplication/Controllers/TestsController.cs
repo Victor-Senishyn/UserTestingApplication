@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 using System.Security.Claims;
+using UserTestingApplication.Exceptions;
+using UserTestingApplication.Models;
 using UserTestingApplication.Repositories.Filters;
 using UserTestingApplication.Services;
 using UserTestingApplication.Services.Interfaces;
@@ -8,43 +11,88 @@ using UserTestingApplication.Services.Interfaces;
 namespace UserTestingApplication.Controllers
 {
     [ApiController]
-    [Route("/tests/")]
+    [Route("api/tests")]
     [Authorize]
     public class TestsController : Controller
     {
         private ITestService _testService;
 
-        public TestsController(ITestService testService)
+        public string UserId
+        {
+            get => User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+        }
+
+        public TestsController(
+            ITestService testService)
         {
             _testService = testService;
         }
 
-        [HttpGet("/tests/completed")]
-        public async Task<IActionResult> GetCompletedTestsAsync()
+        [HttpGet]
+        public async Task<IActionResult> GetTests(
+            CancellationToken cancellationToken)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var completedTests = await _testService.GetCompletedTestsForUserAsync(
-                new ApplicationUserFilter
-                {
-                    Id = userId,
-                });
+            var completedTests = await _testService.GetTestsForUserAsync(
+                new UserTestResultFilter { ApplicationUserId = UserId }, cancellationToken);
 
             return Ok(completedTests);
         }
 
-        [HttpGet("/tests/available")]
-        public async Task<IActionResult> GetAvailableTestsAsync()
+        [HttpGet("/completed")]
+        public async Task<IActionResult> GetCompletedTests(
+            CancellationToken cancellationToken)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var completedTests = await _testService.GetTestsForUserAsync(
+                new UserTestResultFilter { ApplicationUserId = UserId, IsCompleted = true }, cancellationToken);
 
-            var availableTests = await _testService.GetAvailableTestsForUserAsync(
-                new ApplicationUserFilter
-                {
-                    Id = userId,
-                });
+            return Ok(completedTests);
+        }
+
+        [HttpGet("/available")]
+        public async Task<IActionResult> GetAvailableTests(
+            CancellationToken cancellationToken)
+        {
+            var availableTests = await _testService.GetTestsForUserAsync(
+                new UserTestResultFilter { ApplicationUserId = UserId, IsCompleted = false }, cancellationToken);
 
             return Ok(availableTests);
+        }
+
+        [HttpGet("/questions/{testId}")]
+        public async Task<IActionResult> GetQuestionsForTest(
+            int testId,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                var questions = await _testService.GetQuestionsForTestAsync(testId, cancellationToken);
+                return Ok(questions);
+            }
+            catch (TestNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> SubmitUserAnswers(
+            [FromBody] UserAnswer userAnswer,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _testService.SubmitUserAnswersAsync(userAnswer, UserId, cancellationToken);
+                return Ok(result);
+            }
+            catch (DataValidationException ex) 
+            when (ex is TestAlreadyPassedException || ex is DataValidationException)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (TestNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

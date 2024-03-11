@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
+import { TokenContext } from '../token-context.service';
 
 @Component({
   selector: 'app-available-tests',
@@ -13,16 +15,20 @@ import { Router } from '@angular/router';
 export class AvailableTestsComponent implements OnInit {
   tests: any[] = [];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private tokenContext: TokenContext
+  ) {}
 
   ngOnInit(): void {
     this.getAvailableTests();
   }
 
   getAvailableTests(): void {
-    const url = 'https://localhost:7212/available';
+    const url = `${environment.apiUrl}/available`;
 
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = this.tokenContext.getAccessToken();
     const headers = { Authorization: `Bearer ${accessToken}` };
 
     this.http.get(url, { headers }).subscribe(

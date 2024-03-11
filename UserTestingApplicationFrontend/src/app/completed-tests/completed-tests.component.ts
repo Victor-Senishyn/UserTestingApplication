@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { environment } from '../../environments/environment';
+import { TokenContext } from '../token-context.service';
 
 @Component({
   selector: 'app-completed-tests',
@@ -12,16 +14,16 @@ import { Component, OnInit } from '@angular/core';
 export class CompletedTestsComponent implements OnInit {
   tests: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private tokenContext: TokenContext) {}
 
   ngOnInit(): void {
     this.getCompletedTests();
   }
 
   getCompletedTests(): void {
-    const url = 'https://localhost:7212/completed';
+    const url = `${environment.apiUrl}/completed`;
 
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = this.tokenContext.getAccessToken();
     const headers = { Authorization: `Bearer ${accessToken}` };
 
     this.http.get(url, { headers }).subscribe(

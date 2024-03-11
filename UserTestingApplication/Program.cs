@@ -1,13 +1,19 @@
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System;
-using UserTestingApplication.Configs;
+using UserTestingApplication.Utilities;
 using UserTestingApplication.Data;
 using UserTestingApplication.Models;
+using UserTestingApplication.Repositories.Inerfaces;
+using UserTestingApplication.Repositories;
+using UserTestingApplication.Services.Interfaces;
+using UserTestingApplication.Services;
+using UserTestingApplication.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +22,8 @@ builder.Services.Configure<AuthOptions>(
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -27,9 +35,18 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
+
+builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
+builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+builder.Services.AddScoped<IApplicationUserTestRepository, UserTestResultRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<ITestRepository, TestRepository>();
+
+builder.Services.AddScoped<ITestService, TestService>();
+
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -50,5 +67,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapIdentityApi<ApplicationUser>();
+
+app.UseCors(x =>
+{
+    x.WithHeaders().AllowAnyHeader();
+    x.WithMethods().AllowAnyMethod();
+    x.WithOrigins("http://localhost:4200");
+});
 
 app.Run();

@@ -52,19 +52,6 @@ namespace UserTestingApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Question",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Text = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Question", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -171,24 +158,25 @@ namespace UserTestingApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompletedTest",
+                name: "UserTestResult",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    TestId = table.Column<int>(type: "integer", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     Score = table.Column<int>(type: "integer", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "text", nullable: true)
+                    ApplicationUserId = table.Column<string>(type: "text", nullable: false),
+                    TestId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompletedTest", x => x.Id);
+                    table.PrimaryKey("PK_UserTestResult", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompletedTest_AspNetUsers_ApplicationUserId",
+                        name: "FK_UserTestResult_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -199,20 +187,32 @@ namespace UserTestingApplication.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Duration = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "text", nullable: true),
-                    TestId = table.Column<int>(type: "integer", nullable: true)
+                    UserTestResultId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Test", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Test_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_Test_UserTestResult_UserTestResultId",
+                        column: x => x.UserTestResultId,
+                        principalTable: "UserTestResult",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Question",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Text = table.Column<string>(type: "text", nullable: false),
+                    TestId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Question", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Test_Test_TestId",
+                        name: "FK_Question_Test_TestId",
                         column: x => x.TestId,
                         principalTable: "Test",
                         principalColumn: "Id");
@@ -281,19 +281,19 @@ namespace UserTestingApplication.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompletedTest_ApplicationUserId",
-                table: "CompletedTest",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Test_ApplicationUserId",
-                table: "Test",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Test_TestId",
-                table: "Test",
+                name: "IX_Question_TestId",
+                table: "Question",
                 column: "TestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Test_UserTestResultId",
+                table: "Test",
+                column: "UserTestResultId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTestResult_ApplicationUserId",
+                table: "UserTestResult",
+                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -318,16 +318,16 @@ namespace UserTestingApplication.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CompletedTest");
+                name: "Question");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Test");
 
             migrationBuilder.DropTable(
-                name: "Question");
-
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "UserTestResult");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

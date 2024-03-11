@@ -12,7 +12,7 @@ using UserTestingApplication.Data;
 namespace UserTestingApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240306173503_init")]
+    [Migration("20240308230002_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -246,33 +246,6 @@ namespace UserTestingApplication.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("UserTestingApplication.Models.CompletedTest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TestId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("CompletedTest");
-                });
-
             modelBuilder.Entity("UserTestingApplication.Models.Question", b =>
                 {
                     b.Property<int>("Id")
@@ -281,11 +254,16 @@ namespace UserTestingApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("TestId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TestId");
 
                     b.ToTable("Question");
                 });
@@ -298,30 +276,50 @@ namespace UserTestingApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("interval");
-
-                    b.Property<int?>("TestId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("UserTestResultId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserTestResultId");
+
+                    b.ToTable("Test");
+                });
+
+            modelBuilder.Entity("UserTestingApplication.Models.UserTestResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TestId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("TestId");
-
-                    b.ToTable("Test");
+                    b.ToTable("UserTestResult");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -382,29 +380,34 @@ namespace UserTestingApplication.Migrations
                         .HasForeignKey("QuestionId");
                 });
 
-            modelBuilder.Entity("UserTestingApplication.Models.CompletedTest", b =>
+            modelBuilder.Entity("UserTestingApplication.Models.Question", b =>
                 {
-                    b.HasOne("UserTestingApplication.Models.ApplicationUser", null)
-                        .WithMany("CompletedTests")
-                        .HasForeignKey("ApplicationUserId");
-                });
-
-            modelBuilder.Entity("UserTestingApplication.Models.Test", b =>
-                {
-                    b.HasOne("UserTestingApplication.Models.ApplicationUser", null)
-                        .WithMany("Tests")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("UserTestingApplication.Models.Test", null)
                         .WithMany("Questions")
                         .HasForeignKey("TestId");
                 });
 
+            modelBuilder.Entity("UserTestingApplication.Models.Test", b =>
+                {
+                    b.HasOne("UserTestingApplication.Models.UserTestResult", null)
+                        .WithMany("Tests")
+                        .HasForeignKey("UserTestResultId");
+                });
+
+            modelBuilder.Entity("UserTestingApplication.Models.UserTestResult", b =>
+                {
+                    b.HasOne("UserTestingApplication.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserTests")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("UserTestingApplication.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("CompletedTests");
-
-                    b.Navigation("Tests");
+                    b.Navigation("ApplicationUserTests");
                 });
 
             modelBuilder.Entity("UserTestingApplication.Models.Question", b =>
@@ -415,6 +418,11 @@ namespace UserTestingApplication.Migrations
             modelBuilder.Entity("UserTestingApplication.Models.Test", b =>
                 {
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("UserTestingApplication.Models.UserTestResult", b =>
+                {
+                    b.Navigation("Tests");
                 });
 #pragma warning restore 612, 618
         }

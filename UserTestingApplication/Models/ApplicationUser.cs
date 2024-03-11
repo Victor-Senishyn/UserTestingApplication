@@ -4,7 +4,6 @@ namespace UserTestingApplication.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public ICollection<Test> Tests { get; set; }
-        public ICollection<CompletedTest> CompletedTests { get; set; }
+        public ICollection<UserTestResult> ApplicationUserTests { get; set; }
     }
 }

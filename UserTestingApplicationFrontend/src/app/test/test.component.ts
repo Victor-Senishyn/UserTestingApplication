@@ -2,6 +2,9 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../../environments/environment';
+import { TokenContext } from '../token-context.service';
+import { Question } from './question.model';
 
 @Component({
   selector: 'app-test',
@@ -11,13 +14,14 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./test.component.css'],
 })
 export class TestComponent implements OnInit {
-  questions: any[] = [];
+  questions: Question[] = [];
   id!: number;
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
+    private tokenContext: TokenContext
   ) {}
 
   ngOnInit(): void {
@@ -26,8 +30,8 @@ export class TestComponent implements OnInit {
   }
 
   getAvailableTests(): void {
-    const url = `https://localhost:7212/questions/${this.id}`;
-    const accessToken = localStorage.getItem('accessToken');
+    const url = `${environment.apiUrl}/questions/${this.id}`;
+    const accessToken = this.tokenContext.getAccessToken();
     const headers = { Authorization: `Bearer ${accessToken}` };
 
     this.http.get(url, { headers }).subscribe(
@@ -63,13 +67,12 @@ export class TestComponent implements OnInit {
       }
     }
 
-    const url = `https://localhost:7212/api/tests`;
+    const url = `${environment.apiUrl}/api/tests`;
     const accessToken = localStorage.getItem('accessToken');
     const headers = { Authorization: `Bearer ${accessToken}` };
 
     this.http.patch(url, selectedAnswers, { headers }).subscribe(
       (response: any) => {
-        console.log("dfffffffff",response);
         this.questions = response;
         const score = response.score;
         alert(`Score : ${score}`);

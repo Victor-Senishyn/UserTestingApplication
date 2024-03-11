@@ -29,15 +29,18 @@ namespace UserTestingApplication.Repositories
             _dbContext.Set<ApplicationUser>().Remove(applicationUser);
         }
 
-        public async Task<IQueryable<ApplicationUser>> GetAsync(ApplicationUserFilter applicationUserFilter)
+        public async Task<IQueryable<ApplicationUser>> GetAsync(ApplicationUserFilter applicationUserFilter = null)
         {
             var query = _dbContext.ApplicationUsers.AsQueryable();
 
+            if (applicationUserFilter == null)
+                return query;
+
             if (applicationUserFilter.Id != null)
                 query = query.Where(applicationUser => applicationUser.Id == applicationUserFilter.Id);
-            else if (applicationUserFilter.Email != null)
+            if (applicationUserFilter.Email != null)
                 query = query.Where(applicationUser => applicationUser.Email == applicationUserFilter.Email);
-            else if (applicationUserFilter.UserName != null)
+            if (applicationUserFilter.UserName != null)
                 query = query.Where(applicationUser => applicationUser.UserName == applicationUserFilter.UserName);
 
             return query;
