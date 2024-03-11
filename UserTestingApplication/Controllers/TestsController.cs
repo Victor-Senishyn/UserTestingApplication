@@ -17,6 +17,10 @@ namespace UserTestingApplication.Controllers
     {
         private ITestService _testService;
 
+        public string userId
+        {
+            get => User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+        }
 
         public TestsController(
             ITestService testService)
@@ -28,8 +32,6 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetTests(
             CancellationToken cancellationToken)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-
             var completedTests = await _testService.GetTestsForUserAsync(
                 new UserTestResultFilter { ApplicationUserId = userId }, cancellationToken);
 
@@ -40,8 +42,6 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetCompletedTests(
             CancellationToken cancellationToken)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-
             var completedTests = await _testService.GetTestsForUserAsync(
                 new UserTestResultFilter { ApplicationUserId = userId, IsCompleted = true }, cancellationToken);
 
@@ -52,8 +52,6 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> GetAvailableTests(
             CancellationToken cancellationToken)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-
             var availableTests = await _testService.GetTestsForUserAsync(
                 new UserTestResultFilter { ApplicationUserId = userId, IsCompleted = false }, cancellationToken);
 
@@ -83,7 +81,6 @@ namespace UserTestingApplication.Controllers
         {
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var result = await _testService.SubmitUserAnswersAsync(userAnswer, userId, cancellationToken);
                 return Ok(result);
             }
@@ -102,8 +99,6 @@ namespace UserTestingApplication.Controllers
         public async Task<IActionResult> AddTest(
             CancellationToken cancellationToken)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-
             var test = await _testService.CreateTestsForUserAsync(userId, cancellationToken);
 
             return Ok(test); 
