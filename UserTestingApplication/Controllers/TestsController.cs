@@ -94,14 +94,5 @@ namespace UserTestingApplication.Controllers
                 return NotFound(ex.Message);
             }
         }
-
-        [HttpPost("/add")]
-        public async Task<IActionResult> AddTest(
-            CancellationToken cancellationToken)
-        {
-            var test = await _testService.CreateTestsForUserAsync(userId, cancellationToken);
-
-            return Ok(test); 
-        }
     }
 }
