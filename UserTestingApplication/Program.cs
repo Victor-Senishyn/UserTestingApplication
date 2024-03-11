@@ -72,7 +72,7 @@ app.UseCors(x =>
 {
     x.WithHeaders().AllowAnyHeader();
     x.WithMethods().AllowAnyMethod();
-    x.WithOrigins("http://localhost:3000");
+    x.WithOrigins("http://localhost:4200");
 });
 
 app.Run();

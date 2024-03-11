@@ -17,10 +17,6 @@ namespace UserTestingApplication.Controllers
     {
         private ITestService _testService;
 
-        public string UserId
-        {
-            get => User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-        }
 
         public TestsController(
             ITestService testService)
@@ -29,36 +25,42 @@ namespace UserTestingApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTestsAsync(
+        public async Task<IActionResult> GetTests(
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
             var completedTests = await _testService.GetTestsForUserAsync(
-                new UserTestResultFilter { ApplicationUserId = UserId }, cancellationToken);
+                new UserTestResultFilter { ApplicationUserId = userId }, cancellationToken);
 
             return Ok(completedTests);
         }
 
         [HttpGet("/completed")]
-        public async Task<IActionResult> GetCompletedTestsAsync(
+        public async Task<IActionResult> GetCompletedTests(
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
             var completedTests = await _testService.GetTestsForUserAsync(
-                new UserTestResultFilter { ApplicationUserId = UserId, IsCompleted = true }, cancellationToken);
+                new UserTestResultFilter { ApplicationUserId = userId, IsCompleted = true }, cancellationToken);
 
             return Ok(completedTests);
         }
 
         [HttpGet("/available")]
-        public async Task<IActionResult> GetAvailableTestsAsync(
+        public async Task<IActionResult> GetAvailableTests(
             CancellationToken cancellationToken)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
             var availableTests = await _testService.GetTestsForUserAsync(
-                new UserTestResultFilter { ApplicationUserId = UserId, IsCompleted = false }, cancellationToken);
+                new UserTestResultFilter { ApplicationUserId = userId, IsCompleted = false }, cancellationToken);
 
             return Ok(availableTests);
         }
 
-        [HttpGet("{testId}/questions")]
+        [HttpGet("/questions/{testId}")]
         public async Task<IActionResult> GetQuestionsForTest(
             int testId,
             CancellationToken cancellationToken)
@@ -81,7 +83,8 @@ namespace UserTestingApplication.Controllers
         {
             try
             {
-                var result = await _testService.SubmitUserAnswersAsync(userAnswer, UserId, cancellationToken);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var result = await _testService.SubmitUserAnswersAsync(userAnswer, userId, cancellationToken);
                 return Ok(result);
             }
             catch (DataValidationException ex) 
@@ -95,12 +98,13 @@ namespace UserTestingApplication.Controllers
             }
         }
 
-
         [HttpPost("/add")]
         public async Task<IActionResult> AddTest(
             CancellationToken cancellationToken)
         {
-            var test = await _testService.CreateTestsForUserAsync(UserId, cancellationToken);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+
+            var test = await _testService.CreateTestsForUserAsync(userId, cancellationToken);
 
             return Ok(test); 
         }
